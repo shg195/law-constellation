@@ -1,0 +1,184 @@
+:root{
+  --bg:#0b0f17;
+  --bg2:#121826;
+  --panel:#151c2b;
+  --line:#26324a;
+  --fg:#e6ecf6;
+  --muted:#8a97ad;
+  --accent:#6ba3ff;
+  --edge:#3a4a6b;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--fg);
+  font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",system-ui,sans-serif;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+
+/* header */
+#topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:10px 18px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,#0e1420,#0b0f17);
+  flex:0 0 auto;
+}
+.title{display:flex;align-items:baseline;gap:12px}
+.logo{font-size:19px;font-weight:700;letter-spacing:.06em}
+.sub{font-size:12px;color:var(--muted)}
+#legend{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:flex-end}
+.hint{font-size:11.5px;color:var(--muted)}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.sw{display:flex;align-items:center;gap:5px;font-size:12px;color:#cdd6e6}
+.sw i{width:11px;height:11px;border-radius:50%;display:inline-block}
+
+/* stage */
+#stage{position:relative;flex:1 1 auto;min-height:0}
+#graph{width:100%;height:100%;display:block;touch-action:none;background:
+  radial-gradient(1200px 700px at 60% 30%, #101828 0%, #0b0f17 70%);cursor:grab}
+#graph:active{cursor:grabbing}
+#graph3d{position:absolute;inset:0;width:100%;height:100%;touch-action:none;background:#05070f}
+#graph[hidden],#graph3d[hidden]{display:none}
+
+.band-line{stroke:var(--line);stroke-dasharray:4 6;stroke-width:1}
+.band-label{fill:#5d6b86;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:none}
+
+.link{stroke:var(--edge);fill:none}
+/* edge-bg=a-ref（背景・薄く細く）／edge-fg=B層・bridge・委任系（前景・描画順で背景の上に乗る）。線幅・不透明度はapp.js側で重みに応じて設定。 */
+.node circle{stroke:#0b0f17;stroke-width:1.2;cursor:pointer}
+.node.dim{opacity:.14}
+.link.dim{opacity:.03}
+.node-label{display:none;fill:#aeb9cd;font-size:10px;pointer-events:none;text-anchor:middle;paint-order:stroke;stroke:#0b0f17;stroke-width:2.4px;stroke-linejoin:round}
+.node-label.always{display:block}
+.node.sel .node-label{display:block}
+#graph.zoomed-in .node-label{display:block}
+.node.sel circle{stroke:#fff;stroke-width:2.4}
+
+/* 左オーバーレイ：構図＋フィルタ */
+#overlay-left{
+  position:absolute;top:14px;left:14px;z-index:16;
+  width:284px;max-height:calc(100% - 28px);overflow:auto;
+  display:flex;flex-direction:column;gap:12px;
+  pointer-events:none;
+}
+.ovbox{
+  pointer-events:auto;
+  background:#131a29ee;border:1px solid var(--line);border-radius:12px;
+  padding:12px 14px;box-shadow:0 10px 34px #0007;backdrop-filter:blur(3px);
+}
+.ovbox h3{font-size:12.5px;margin:0 0 9px;color:#cdd6e6;font-weight:700;letter-spacing:.04em;display:flex;justify-content:space-between;align-items:center}
+.ovbox h3 .tiny{font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0}
+.ovbox h3.collapsible{cursor:pointer;user-select:none;margin-bottom:0}
+.ovbox h3.collapsible .chev{transition:transform .18s;color:var(--muted);font-size:11px}
+#fbox.collapsed #fbody{display:none}
+#fbox.collapsed h3 .chev{transform:rotate(-90deg)}
+#fbox #fbody{margin-top:10px}
+
+/* フィルタ */
+.fgroup{margin-bottom:11px}
+.flabel{font-size:11px;color:var(--muted);margin-bottom:5px;letter-spacing:.04em}
+.flabel .tiny{font-size:9.5px;opacity:.8;margin-left:4px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{
+  display:inline-flex;align-items:center;gap:4px;cursor:pointer;user-select:none;
+  font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid var(--line);
+  background:#0e1626;color:#c3ccdb;line-height:1.3;
+}
+.chip i{width:9px;height:9px;border-radius:50%;display:inline-block;flex:0 0 auto}
+.chip.edge i{width:12px;height:3px;border-radius:2px}
+.chip.off{opacity:.35;text-decoration:line-through;text-decoration-thickness:1px}
+.chip:hover{border-color:var(--accent)}
+.chip.layer-chip.on{background:var(--accent);color:#06101f;font-weight:700;border-color:var(--accent)}
+.fcheck{display:flex;align-items:center;gap:7px;font-size:11.5px;color:#c3ccdb;cursor:pointer}
+.fcheck input{accent-color:var(--accent)}
+.linkbtn{background:none;border:none;color:var(--muted);font:inherit;font-size:11px;cursor:pointer;padding:2px 0;text-decoration:underline}
+.linkbtn:hover{color:var(--accent)}
+.mobile-legend-group{display:none} /* 凡例のフィルタ内複製・狭幅のみ表示（#legendはヘッダー側） */
+
+/* tooltip */
+#tooltip{
+  position:absolute;pointer-events:none;z-index:20;
+  background:#0d1422f2;border:1px solid var(--line);border-radius:7px;
+  padding:6px 10px;font-size:12.5px;max-width:280px;
+  box-shadow:0 6px 20px #0009;
+}
+#tooltip .t-name{font-weight:700}
+#tooltip .t-meta{color:var(--muted);font-size:11px;margin-top:2px}
+
+/* panel */
+#panel{
+  position:absolute;top:14px;right:14px;width:330px;max-height:calc(100% - 28px);
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:16px 18px;overflow:auto;z-index:15;
+  box-shadow:0 12px 40px #0008;
+}
+#panel.empty{display:none}
+.panel-body{position:relative}
+#panel-close{position:absolute;top:-4px;right:-4px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1}
+#panel-close:hover{color:var(--fg)}
+#p-name{font-size:17px;margin:2px 34px 8px 0;line-height:1.4}
+.p-cat{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.layer-tag{font-size:10.5px;letter-spacing:.08em;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:1px 6px}
+.p-warn{background:#5c1f1f;color:#ffc9c9;font-size:11.5px;line-height:1.6;padding:7px 10px;border-radius:6px;margin-bottom:10px;border:1px solid #7a2a2a}
+.p-desc{font-size:12.5px;line-height:1.85;white-space:pre-wrap;margin-bottom:12px;color:#dbe3f0}
+.p-text-wrap{margin-bottom:12px;border:1px solid var(--line);border-radius:8px;background:#0d1422}
+.p-text-wrap h3{font-size:11px;color:var(--muted);margin:0;padding:7px 10px 0;font-weight:600}
+.p-text{font-size:12px;line-height:1.9;white-space:pre-wrap;color:#dbe3f0;margin:0;padding:6px 10px 10px;font-family:inherit;max-height:260px;overflow:auto}
+.p-src{font-size:11px;line-height:1.7;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px;margin-top:10px}
+.p-src .src-line{margin-bottom:4px}
+.p-src .src-link{color:var(--accent);text-decoration:underline;margin-left:2px}
+.p-src .src-link:hover{color:#9cc3ff}
+.reflist .arrow{display:inline-block;width:16px;font-weight:700}
+.reflist .rel{display:block;color:var(--muted);font-size:10.5px;margin:0 0 4px 16px;line-height:1.4}
+#p-meta{margin:0 0 8px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px}
+#p-meta dt{color:var(--muted)}
+#p-meta dd{margin:0}
+.tier-pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:700}
+.reflist{margin-top:12px}
+.reflist h3{font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:600;border-bottom:1px solid var(--line);padding-bottom:4px}
+.reflist ol{margin:0;padding-left:20px;font-size:12.5px;line-height:1.6}
+.reflist li{cursor:pointer}
+.reflist li:hover{color:var(--accent)}
+.reflist .w{color:var(--muted);font-size:11px;margin-left:4px}
+.reflist .none{color:#66738c;list-style:none;margin-left:-16px}
+
+/* footer */
+#statusbar{
+  flex:0 0 auto;padding:5px 18px;border-top:1px solid var(--line);
+  background:#0e1420;font-size:11.5px;color:var(--muted);
+}
+
+/* ===== I1-2: モバイル最適化（〜430px） ===== */
+@media (max-width: 430px) {
+  /* 凡例：ヘッダーから隠しフィルタ内の複製へ */
+  #legend{display:none}
+  .mobile-legend-group{display:block}
+
+  /* 左オーバーレイ：画面幅に合わせて縮める */
+  #overlay-left{width:calc(100% - 24px);left:12px;top:10px;max-height:calc(100% - 20px)}
+  #fbox #fbody{max-height:56vh;overflow:auto}
+
+  /* フィルタ見出し＝開閉トグルボタン。タップ領域確保 */
+  .ovbox h3.collapsible{min-height:44px}
+
+  /* チップ・チェック・リンクボタン：タップターゲット44px以上 */
+  .chip{min-height:44px;padding:6px 14px;font-size:13px}
+  .fcheck{min-height:44px}
+  .fcheck input{width:20px;height:20px}
+  .linkbtn{display:inline-flex;align-items:center;min-height:44px;padding:0}
+  #panel-close{width:44px;height:44px;display:flex;align-items:center;justify-content:center;top:-8px;right:-8px;font-size:26px}
+
+  /* 帯ラベルは可読性のため一段大きく */
+  .band-label{font-size:13px}
+
+  /* 詳細パネル＝画面下部のシート化（最大高40vh・スクロール可） */
+  #panel{
+    top:auto;left:0;right:0;bottom:0;
+    width:100%;max-width:100%;max-height:40vh;
+    border-radius:14px 14px 0 0;
+    box-shadow:0 -10px 34px #0009;
+  }
+}

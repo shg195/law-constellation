@@ -1,0 +1,23 @@
+# === law-constellation public snapshot ===
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# データ（graph.json と b_layer.json は同梱するので除外しない）
+data/cache/
+data/output/references_raw.json
+
+# 作業・一時・ログ
+scratch/
+*.log
+
+# 内部作業物（誤コミット防止）
+docs/
+CLAUDE.md
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>法令星図 — 建築・災害ドメイン（A層=法律網／B層=条例・判例）</title>
+  <!-- CDN依存なし・ローカルバンドル。three→3d-force-graph の順（3d-force-graphはwindow.THREE前提）。 -->
+  <script src="lib/three.min.js"></script>
+  <script src="lib/3d-force-graph.min.js"></script>
+  <script src="lib/d3.v7.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header id="topbar">
+    <div class="title">
+      <span class="logo">法令星図</span>
+      <span class="sub">建築・災害ドメイン</span>
+    </div>
+    <div id="legend">
+      <span class="swatches" id="type-legend"></span>
+    </div>
+  </header>
+
+  <main id="stage">
+    <svg id="graph" role="img" aria-label="法令参照ネットワーク 2D断面図"></svg>
+    <div id="graph3d" hidden></div>
+    <div id="tooltip" hidden></div>
+
+    <!-- 左オーバーレイ：強調表示セット（Cite Grid輸入）＋フィルタ（Legislative Explorer輸入） -->
+    <div id="overlay-left">
+      <section id="fbox" class="ovbox">
+        <h3 id="fhead" class="collapsible">フィルタ<span class="chev">▾</span></h3>
+        <div id="fbody">
+          <div class="hint">縦＝法の段階（上ほど上位の規範）</div>
+          <div class="fgroup mobile-legend-group">
+            <div class="flabel">凡例</div>
+            <span class="swatches" id="type-legend-mobile"></span>
+          </div>
+          <div class="fgroup">
+            <div class="flabel">レイヤ</div>
+            <div id="f-layer" class="chips" role="group" aria-label="レイヤ選択">
+              <span class="chip layer-chip" data-layer="A">A層 法律網</span>
+              <span class="chip layer-chip on" data-layer="AB">A＋B層</span>
+              <span class="chip layer-chip" data-layer="B">B層 断面</span>
+            </div>
+          </div>
+          <div class="fgroup">
+            <div class="flabel">法段階</div>
+            <div id="f-types" class="chips" role="group" aria-label="法段階フィルタ"></div>
+          </div>
+          <div class="fgroup">
+            <div class="flabel">年代（元号）<span class="tiny">A層のみ</span></div>
+            <div id="f-eras" class="chips" role="group" aria-label="年代フィルタ"></div>
+          </div>
+          <div class="fgroup">
+            <label class="fcheck"><input type="checkbox" id="f-blayer" checked> B層（条例・条・判例・運用等）を表示</label>
+          </div>
+          <div class="fgroup">
+            <div class="flabel">エッジ種別 <span class="tiny">クリックで表示切替</span></div>
+            <div id="edge-legend" class="chips" role="group" aria-label="エッジ種別凡例"></div>
+          </div>
+          <button id="filter-reset" class="linkbtn">すべて表示に戻す</button>
+        </div>
+      </section>
+    </div>
+
+    <aside id="panel" class="empty">
+      <div class="panel-body" hidden>
+        <button id="panel-close" aria-label="閉じる">×</button>
+        <h2 id="p-name"></h2>
+        <div id="p-cat" class="p-cat"></div>
+        <div id="p-warn" class="p-warn" hidden></div>
+        <div id="p-desc" class="p-desc" hidden></div>
+        <div id="p-text-wrap" class="p-text-wrap" hidden>
+          <h3>条文</h3>
+          <pre id="p-text" class="p-text"></pre>
+        </div>
+        <dl id="p-meta"></dl>
+        <div id="p-src" class="p-src" hidden></div>
+        <div class="reflist" id="p-out-wrap" hidden>
+          <h3 id="p-out-h">参照先 上位5</h3>
+          <ol id="p-out"></ol>
+        </div>
+        <div class="reflist" id="p-in-wrap" hidden>
+          <h3 id="p-in-h">参照元 上位5</h3>
+          <ol id="p-in"></ol>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer id="statusbar">
+    <span id="status">読み込み中…</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
